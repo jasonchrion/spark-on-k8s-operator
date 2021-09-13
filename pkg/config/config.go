@@ -17,6 +17,7 @@ limitations under the License.
 package config
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
@@ -76,7 +77,7 @@ func GetK8sConfigMap(app *v1beta2.SparkApplication, cmName string) (string, erro
 	}
 
 	configMapsInNamespace := clientset.ConfigMaps(app.Namespace)
-	userProvidedConfigMap, err := configMapsInNamespace.Get(cmName, metav1.GetOptions{})
+	userProvidedConfigMap, err := configMapsInNamespace.Get(context.TODO(), cmName, metav1.GetOptions{})
 
 	if err != nil {
 		glog.Errorf("%v", err)
