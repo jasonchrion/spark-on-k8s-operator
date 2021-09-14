@@ -66,9 +66,7 @@ func runSparkSubmit(exportEnvVars []string, submission *submission) (bool, error
 	// exporting HADOOP_CONF_DIR during spark-submit
 	if exportEnvVars != nil {
 		exportEnvVarsToString := strings.Join(exportEnvVars, " ")
-		argsToString := strings.Join(submission.args, " ")
-		result := exportEnvVarsToString + command + " " + argsToString
-		cmd = execCommand("/bin/sh", "-c", result)
+		cmd = execCommand(exportEnvVarsToString+command, submission.args...)
 	} else {
 		cmd = execCommand(command, submission.args...)
 	}
@@ -97,7 +95,7 @@ func runSparkSubmit(exportEnvVars []string, submission *submission) (bool, error
 
 func buildSubmissionCommandArgs(app *v1beta2.SparkApplication, driverPodName string, submissionID string) ([]string, []string, error) {
 	var args []string
-	var exportenv []string
+	var exportEnvVars []string
 
 	if app.Spec.MainClass != nil {
 		args = append(args, "--class", *app.Spec.MainClass)
@@ -154,7 +152,7 @@ func buildSubmissionCommandArgs(app *v1beta2.SparkApplication, driverPodName str
 			return nil, nil, err
 		}
 		// Setting HADOOP_CONF_DIR
-		exportenv = append(exportenv, fmt.Sprintf("export HADOOP_CONF_DIR=%s;", hadoopConfLoc))
+		exportEnvVars = append(exportEnvVars, fmt.Sprintf("export HADOOP_CONF_DIR=%s;", hadoopConfLoc))
 	}
 
 	// Add Spark configuration properties.
@@ -219,7 +217,7 @@ func buildSubmissionCommandArgs(app *v1beta2.SparkApplication, driverPodName str
 		args = append(args, argument)
 	}
 
-	return exportenv, args, nil
+	return exportEnvVars, args, nil
 }
 
 func getMasterURL() (string, error) {
