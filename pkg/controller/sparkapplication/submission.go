@@ -220,8 +220,9 @@ func buildSubmissionCommandArgs(app *v1beta2.SparkApplication, driverPodName str
 	}
 
 	// Add application arguments.
+	// wrapped argument with quotation marks to avoid bash shell take semicolon as the end of a command
 	for _, argument := range app.Spec.Arguments {
-		args = append(args, argument)
+		args = append(args, "\""+argument+"\"")
 	}
 
 	return exportEnvVars, args, nil
