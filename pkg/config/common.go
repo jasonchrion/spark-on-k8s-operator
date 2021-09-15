@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"github.com/golang/glog"
 	v1 "k8s.io/api/core/v1"
 	"os"
@@ -100,4 +101,32 @@ func RemoveDirectory(appNamespace string, appName string) {
 	} else {
 		glog.V(2).Infof("Deleting %s if it exists", dirToRemove)
 	}
+}
+
+func WriteSparkSubmitShell(appNamespace string, appName string, commands []string) (*os.File, error) {
+	var dir = mntDir + appNamespace + "/" + appName
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		err := os.MkdirAll(dir, 0770)
+		if err != nil {
+			glog.Errorf("mkdir %s error: %v", dir, err)
+			return nil, err
+		}
+	}
+	shellFile := dir + "/" + appName + ".sh"
+	var file *os.File
+	if _, err := os.Stat(shellFile); os.IsNotExist(err) {
+		file, err = os.Create(shellFile)
+		if err != nil {
+			glog.Errorf("create file %s error: %v", shellFile, err)
+			return nil, err
+		}
+	} else {
+		return nil, fmt.Errorf("shell file for SparkApplication %s/%s already exists", appNamespace, appName)
+	}
+	defer file.Close()
+	os.Chmod(file.Name(), 0770)
+	for _, command := range commands {
+		file.WriteString(command + "\n")
+	}
+	return file, nil
 }

@@ -64,12 +64,19 @@ func runSparkSubmit(exportEnvVars []string, submission *submission) (bool, error
 
 	// exportEnvVars is not nil when .ap.Spec.HadoopConfigMap is specified for spark-jobs
 	// exporting HADOOP_CONF_DIR during spark-submit
-	if exportEnvVars != nil {
-		exportEnvVarsToString := strings.Join(exportEnvVars, " ")
-		cmd = execCommand(exportEnvVarsToString+command, submission.args...)
-	} else {
-		cmd = execCommand(command, submission.args...)
+	commands := []string{
+		"#!/bin/bash",
+		"",
 	}
+	if exportEnvVars != nil {
+		commands = append(commands, exportEnvVars...)
+	}
+	commands = append(commands, command+" "+strings.Join(submission.args, " "))
+	shell, err := config.WriteSparkSubmitShell(submission.namespace, submission.name, commands)
+	if err != nil {
+		return false, fmt.Errorf("failed to create spark-submit shell file for SparkApplication %s/%s: %v", submission.namespace, submission.name, err)
+	}
+	cmd = execCommand("/bin/sh", "-c", shell.Name())
 
 	glog.V(2).Infof("spark-submit arguments: %v", cmd.Args)
 	output, err := cmd.CombinedOutput()
