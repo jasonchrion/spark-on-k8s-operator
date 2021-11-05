@@ -117,12 +117,15 @@ All charts linted successfully
 | resources | object | `{}` | Pod resource requests and limits |
 | resyncInterval | int | `30` | Operator resync interval. Note that the operator will respond to events (e.g. create, update) unrelated to this setting |
 | securityContext | object | `{}` | Operator container security context |
+| serviceAccounts.spark.annotations | object | `{}` | Optional annotations for the spark service account |
 | serviceAccounts.spark.create | bool | `true` | Create a service account for spark apps |
 | serviceAccounts.spark.name | string | `""` | Optional name for the spark service account |
+| serviceAccounts.sparkoperator.annotations | object | `{}` | Optional annotations for the operator service account |
 | serviceAccounts.sparkoperator.create | bool | `true` | Create a service account for the operator |
 | serviceAccounts.sparkoperator.name | string | `""` | Optional name for the operator service account |
 | sparkJobNamespace | string | `""` | Set this if running spark jobs in a different namespace than the operator |
 | tolerations | list | `[]` | List of node taints to tolerate |
+| webhook.initAnnotations | object | `{"helm.sh/hook":"pre-install, pre-upgrade","helm.sh/hook-weight":"50"}` | The annotations applied to init job, required to restore certs deleted by the cleanup job during upgrade |
 | webhook.cleanupAnnotations | object | `{"helm.sh/hook":"pre-delete, pre-upgrade","helm.sh/hook-delete-policy":"hook-succeeded"}` | The annotations applied to the cleanup job, required for helm lifecycle hooks |
 | webhook.enable | bool | `false` | Enable webhook server |
 | webhook.namespaceSelector | string | `""` | The webhook server will only operate on namespaces with this label, specified in the form key1=value1,key2=value2. Empty string (default) will operate on all namespaces |
