@@ -5,6 +5,8 @@ import (
 	"github.com/golang/glog"
 	v1 "k8s.io/api/core/v1"
 	"os"
+	"strconv"
+	"time"
 )
 
 const mntDir = "/mnt/"
@@ -112,7 +114,7 @@ func WriteSparkSubmitShell(appNamespace string, appName string, commands []strin
 			return nil, err
 		}
 	}
-	shellFile := dir + "/" + appName + ".sh"
+	shellFile := dir + "/" + appName + strconv.FormatInt(time.Now().Unix(), 10) + ".sh"
 	var file *os.File
 	if _, err := os.Stat(shellFile); os.IsNotExist(err) {
 		file, err = os.Create(shellFile)
