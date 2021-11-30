@@ -37,3 +37,5 @@
 | [Tongdun](https://www.tongdun.net/) | @lomoJG | Production | AI/ML & Analytics |
 | [Totvs Labs](https://www.totvslabs.com) | @luizm | Production | Data Platform |
 | [DiDi](https://www.didiglobal.com) | @Run-Lin | Evaluation | Data Infrastructure |
+| [DeepCure](https://www.deepcure.ai) | @mschroering | Production | Spark / ML |
+| [C2FO](https://www.c2fo.com/) | @vanhoale | Production | Data Platform / Data Infrastructure |
