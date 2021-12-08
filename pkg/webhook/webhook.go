@@ -298,9 +298,12 @@ func (wh *WebHook) serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := admissionv1.AdmissionReview{}
+	response := admissionv1.AdmissionReview{
+		TypeMeta: metav1.TypeMeta{APIVersion: "admission.k8s.io/v1", Kind: "AdmissionReview"},
+		Response: reviewResponse,
+	}
+
 	if reviewResponse != nil {
-		response.Response = reviewResponse
 		if review.Request != nil {
 			response.Response.UID = review.Request.UID
 		}
@@ -379,6 +382,8 @@ func (wh *WebHook) selfRegistration(webhookConfigName string) error {
 		},
 	}
 
+	sideEffect := arv1.SideEffectClassNoneOnDryRun
+
 	mutatingWebhook := arv1.MutatingWebhook{
 		Name:  webhookName,
 		Rules: mutatingRules,
@@ -386,9 +391,11 @@ func (wh *WebHook) selfRegistration(webhookConfigName string) error {
 			Service:  wh.serviceRef,
 			CABundle: caCert,
 		},
-		FailurePolicy:     &wh.failurePolicy,
-		NamespaceSelector: wh.selector,
-		TimeoutSeconds:    wh.timeoutSeconds,
+		FailurePolicy:           &wh.failurePolicy,
+		NamespaceSelector:       wh.selector,
+		TimeoutSeconds:          wh.timeoutSeconds,
+		SideEffects:             &sideEffect,
+		AdmissionReviewVersions: []string{"v1"},
 	}
 
 	validatingWebhook := arv1.ValidatingWebhook{
@@ -398,9 +405,11 @@ func (wh *WebHook) selfRegistration(webhookConfigName string) error {
 			Service:  wh.serviceRef,
 			CABundle: caCert,
 		},
-		FailurePolicy:     &wh.failurePolicy,
-		NamespaceSelector: wh.selector,
-		TimeoutSeconds:    wh.timeoutSeconds,
+		FailurePolicy:           &wh.failurePolicy,
+		NamespaceSelector:       wh.selector,
+		TimeoutSeconds:          wh.timeoutSeconds,
+		SideEffects:             &sideEffect,
+		AdmissionReviewVersions: []string{"v1"},
 	}
 
 	mutatingWebhooks := []arv1.MutatingWebhook{mutatingWebhook}
