@@ -4,6 +4,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.8.0
+    api-approved.kubernetes.io: https://github.com/GoogleCloudPlatform/spark-on-k8s-operator/pull/1298
   creationTimestamp: null
   name: scheduledsparkapplications.sparkoperator.k8s.io
 spec:
@@ -4571,6 +4572,22 @@ spec:
     storage: true
     subresources:
       status: {}
+    additionalPrinterColumns:
+    - jsonPath: .spec.schedule
+      name: Schedule
+      type: string
+    - jsonPath: .spec.suspend
+      name: Suspend
+      type: boolean
+    - jsonPath: .status.lastRun
+      name: Last Run
+      type: date
+    - jsonPath: .status.lastRunName
+      name: Last Run Name
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
 status:
   acceptedNames:
     kind: ""
