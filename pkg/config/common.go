@@ -97,11 +97,16 @@ func copyToFile(d dynamicCopy, appNamespace string, appName string, resourceName
 // RemoveDirectory removes the directory where configmaps and secrets are dynamically copied
 func RemoveDirectory(appNamespace string, appName string) {
 	var dirToRemove = mntDir + appNamespace + "/" + appName
-	err := os.RemoveAll(dirToRemove)
-	if err != nil {
-		glog.Errorf("%v", err)
+	debugMode, present := os.LookupEnv("DEBUG_MODE")
+	if present && debugMode == "true" {
+		glog.V(2).Infof("Debug mode enabled, DO NOT DELETE %s", dirToRemove)
 	} else {
-		glog.V(2).Infof("Deleting %s if it exists", dirToRemove)
+		err := os.RemoveAll(dirToRemove)
+		if err != nil {
+			glog.Errorf("%v", err)
+		} else {
+			glog.V(2).Infof("Deleting %s if it exists", dirToRemove)
+		}
 	}
 }
 
